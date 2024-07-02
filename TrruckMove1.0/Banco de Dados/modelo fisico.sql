@@ -2,7 +2,7 @@ create database truckmoveinicial;
 use truckmoveinicial;
 
 
-CREATE TABLE Usuario( -- Motorista
+CREATE TABLE Usuarios( -- Motorista
   ID INT primary key NOT NULL AUTO_INCREMENT,
   nome VARCHAR(45) NOT NULL,
   senha VARCHAR(45) NOT NULL,
