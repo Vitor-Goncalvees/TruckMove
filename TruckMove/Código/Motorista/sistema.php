@@ -37,28 +37,15 @@ else
     background-image: linear-gradient(to left, #003082,  rgb(20, 147, 220));
     color:white; 
         }
+        
+    .barra-menu{
+        background-color: #003082;
+        display: flex;
+        justify-content: start; 
 
-        .box{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 30px;
-    border-radius: 15px;
-    }
+    }    
 
-    .btnpedi{
-    text-decoration: none;
-    color: white;
-    border: 3px solid dodgerblue;
-    border-radius: 10px;
-    padding: 10px;
-    }
-
-    #btnpedi:hover{
-    background-color: #003082;
-    }   
+       
     </style>
 </head>
 <body>
@@ -68,12 +55,16 @@ else
     <a  href="deslogar.php" class="btn btn-outline-success" type="submit" style="background-color: red; color:white;">Deslogar</a>
   </div>
 </nav>
-    <h1>Acessou o Sistema Motorista</h1>
-
+    <section class="barra-menu">
     <div class="box">
         <a class="btnpedi" href="buscarPedido.php">Ver Pedidos</a>
         <a class="btnpedi" href="veiculos.php">Ver Veiculos</a>
-        <a href="pedAceito.php">Ver Pedidos em andamento</a>
+        <a  class="btnpedi" href="pedAceito.php">Ver Pedidos em andamento</a>
+        <a  class="btnpedi" href="paginaEditarPerfil.php">Ver Perfil</a>
     </div>
+    </section>
+    <h1>Acessou o Sistema Motorista</h1>
+
+   
 </body>
 </html>

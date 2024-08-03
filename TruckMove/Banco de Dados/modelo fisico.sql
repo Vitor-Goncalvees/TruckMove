@@ -17,7 +17,6 @@ CREATE TABLE Motorista(
   carteira_motor VARCHAR(60) NOT NULL
 ) engine InnoDB;
 
-insert into Motorista values(2,'lucas',1234,23456,'lucas@email',319876,'Masculino',01/11/2006,'BH','MG', 'Rua Canaã','632652652');
 
 CREATE TABLE Veiculo(
 id_veiculo int primary key not null auto_increment,
@@ -29,8 +28,6 @@ id_motorista int not null,
 foreign key (id_motorista) references Motorista(ID)
 )engine InnoDB;
 
-insert into veiculo values(default,'camionete','12345',2017,'Honda',1);
-insert into veiculo values(default,'moto','12345',2018,'Fiat',2);
 
 
 create table Cliente(
@@ -79,8 +76,16 @@ CREATE TABLE Ajudante(
 )
 ;
 
+CREATE OR REPLACE VIEW view_veiculo
+as
+select id_veiculo, veiculo, placa, ano, modelo, id_motorista, email
+from veiculo 
+join motorista on (veiculo.id_motorista = motorista.ID);
+
+select * from view_veiculo where email = 'vitor@email'; 
+
 select * from cliente;
-select* from pedido;
+select * from pedido;
 select * from motorista;
 select * from veiculo;
 
@@ -89,4 +94,10 @@ Motorista
 join Veiculo using(id_motorista);
 
 select id from motorista where email = 'lucas@email'; 
-
+-- INSERTS
+insert into veiculo values(default,'camionete','12345',2017,'Honda',1);
+insert into veiculo values(default,'moto','12345',2018,'Fiat',2);
+insert into Motorista values(1,'vitor',1610,23456,'vitor@email',319876,'Masculino',16/10/2006,'BH','MG', 'Rua Canaã','632652652');
+insert into Motorista values(2,'lucas',1234,23456,'lucas@email',319876,'Masculino',01/11/2006,'BH','MG', 'Rua Santa Cruz','632652652');
+insert into pedido values(default, 1,'36kg','30km',0,'BH','Sabará','camionete', null);
+insert into cliente values(1, 'vitor', 1610, 12345, 'vitor@email', 11232423534, 'Masculino', 16/10/2006, 'Belo Horzonte', 'MG', 'Rua Canaã');
