@@ -54,7 +54,7 @@ a:hover{
         <h2>Vamos nos fortalecer e crescer juntos!!!</h2>
 
     <div class="box">
-        <a href="Motorista/Cadastro/TelaLogin.php">Login</a>
+        <a href="Motorista/TelaLogin.php">Login</a>
         <a href="Motorista/Cadastro/cadastroMotorista.php">Cadastre-se</a>
     </div>
 

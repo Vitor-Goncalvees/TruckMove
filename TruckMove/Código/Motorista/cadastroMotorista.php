@@ -2,43 +2,8 @@
 
 if(isset($_POST['submit'])){
 
-    /*print_r('Nome: ' . $_POST['nome']);
-    print_r('<br>');
-
-    print_r('CPF: ' . $_POST['cpf']);
-    print_r('<br>');
-
-    print_r('Email: '. $_POST['email']);
-    print_r('<br>');
-
-    print_r('Telefone: '. $_POST['telefone']);
-    print_r('<br>');
-
-    print_r('Sexo: '. $_POST['genero']);
-    print_r('<br>');
-
-    print_r('Data de Nascimento: '. $_POST['datanascimento']); 
-    print_r('<br>');
-
-    print_r('Cidade: '. $_POST['cidade']); 
-    print_r('<br>');
-
-    print_r('Estado: '. $_POST['estado']); 
-    print_r('<br>');
-
-    print_r('Endereço: '. $_POST['endereco']);
-    print_r('<br>');
-
-    print_r('Veículo: '. $_POST['tipo']);
-    print_r('<br>');
-
-    print_r('Placa: '. $_POST['placa']);
-    print_r('<br>');
-    
-    print_r('Carteira de Motorista: '. $_POST['carteiramotor']);
-    */
-
     include_once('config.php');
+    
     
     $nome =  $_POST['nome'];
     $password = $_POST['senha'];
