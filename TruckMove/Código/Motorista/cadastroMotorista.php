@@ -1,4 +1,5 @@
 <?php
+$msg = "";
 
 if(isset($_POST['submit'])){
 
@@ -16,11 +17,16 @@ if(isset($_POST['submit'])){
     $estado =  $_POST['estado'];
     $endereco = $_POST['endereco'];
    
-
-    $result = mysqli_query($conexao, "INSERT INTO motorista(nome,senha,cpf,email,telefone,sexo,data_nasc,cidade,estado,endereco) VALUES ('$nome','$password','$cpf','$email','$tel','$sexo','$data_nasc','$cidade','$estado','$endereco')");
-
+    
+    try{
+        $result = mysqli_query($conexao, "INSERT INTO motorista(nome,senha,cpf,email,telefone,sexo,data_nasc,cidade,estado,endereco) VALUES ('$nome','$password','$cpf','$email','$tel','$sexo','$data_nasc','$cidade','$estado','$endereco')");
+        header('Location: TelaLogin.php');
+    }catch(Exception $e){
+        $msg = "Não foi possivel cadastrar o usuário";
+    }
+    
    
-    header('Location: TelaLogin.php');
+    
 };
 ?>
 
@@ -116,6 +122,12 @@ legend{
 <body>
 <a href="Código\homeMotorista.php">Voltar para home</a>
     <div class="box">
+        <?php 
+        if($msg != ""){
+            echo "<h1> $msg </h1>";
+        }
+        
+        ?>
         <form action="cadastroMotorista.php" method="POST">
             <fieldset>
                 <legend><b>Cadastro de Motorista</b></legend>

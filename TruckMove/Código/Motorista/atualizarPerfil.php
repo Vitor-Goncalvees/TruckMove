@@ -12,7 +12,7 @@ $email = $_SESSION['email'];
 
 if (isset($_POST['submit'])) {
     $nome = $conexao->real_escape_string($_POST['nome']);
-    $senha = $conexao->real_escape_string($_POST['senha']); //password_hash($_POST['senha'], PASSWORD_DEFAULT); // Criptografe a senha
+    $senha = $conexao->real_escape_string($_POST['senha']); 
     $cpf = $conexao->real_escape_string($_POST['cpf']);
     $telefone = $conexao->real_escape_string($_POST['telefone']);
     $cidade = $conexao->real_escape_string($_POST['cidade']);

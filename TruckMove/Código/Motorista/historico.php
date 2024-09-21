@@ -3,44 +3,35 @@
 
 include_once('config.php');
 session_start();
+$email = $_SESSION['email'];
 
-if (!isset($_SESSION["email"])){
+if (!isset($_SESSION["email"])) {
     header("location:../Cadastro/TelaLogin.php");
     exit;
 }
 
-$sql = "SELECT * FROM pedido WHERE status_pedido = 0";
+$sql = "SELECT * FROM pedido WHERE status_pedido = 3 and id_motorista = ?"; //colocar a do motorista
+$params = [$_SESSION["motorista_id"]];
+$types = 's'; // Tipo de dado para os parâmetros (s para string)
+
 if (!empty($_GET['search'])) {
     $data = $_GET['search'];
-    $sql = "SELECT * FROM pedido WHERE id_pedido LIKE '%$data%' or id_cliente LIKE '%$data%' or partida LIKE '%$data%' or destino LIKE '%$data%' AND status_pedido = 0";
+    $sql = "SELECT * FROM pedido WHERE (id LIKE ? OR id_cliente LIKE ? OR partida LIKE ? OR destino LIKE ?) AND status_pedido = 1 ";
+    $params = ["%$data%", "%$data%", "%$data%", "%$data%", $email];
+    $types = 'sssss'; // Tipo de dado para os parâmetros (s para string)
 }
 
-$result = $conexao->query($sql);
+$stmt = $conexao->prepare($sql);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $listapedi = $_POST['tipo'];
-    $sql = "";
+// Bind dos parâmetros
+$stmt->bind_param($types, ...$params);
 
-    if ($listapedi == "caminhao") {
-        $sql = "SELECT * FROM pedido WHERE tipo_veiculo = 'caminhao' and status_pedido = 0";
-    } elseif ($listapedi == "camionete") {
-        $sql = "SELECT * FROM pedido WHERE tipo_veiculo = 'camionete' and status_pedido = 0";
-    } elseif ($listapedi == "carrocon") {
-        $sql = "SELECT * FROM pedido WHERE tipo_veiculo = 'carrocon' and status_pedido = 0";
-    } elseif ($listapedi == "carroutili") {
-        $sql = "SELECT * FROM pedido WHERE tipo_veiculo = 'carroutili' and status_pedido = 0";
-    } elseif ($listapedi == "moto") {
-        $sql = "SELECT * FROM pedido WHERE tipo_veiculo = 'motoca' and status_pedido = 0";
-    } elseif ($listapedi == "todos") {
-        $sql = "SELECT * FROM pedido WHERE status_pedido = 0";
-    } else {
-        echo "Não encontramos os pedidos";
-    }
+// Execução da consulta
+$stmt->execute();
+$result = $stmt->get_result();
 
-    if (!empty($sql)) {
-        $result = $conexao->query($sql);
-    }
-}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -78,8 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-    
-<nav id="sidebar">
+
+    <nav id="sidebar">
 
         <div id="sidebar_content">
             <div id="user">
@@ -162,35 +153,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div id="logout">
             <button id="logout_btn">
                 <i class="fa-solid fa-right-from-bracket"></i>
+
                 <a href="deslogar.php" id="butao_sair">
                 <span class="item-description">
                     Sair
                 </span>
                 </a>
-                
             </button>
         </div>
 
-</nav>
-   <main> 
-    <form action="buscarPedido.php" method="POST">
-        <p>Selecione o tipo de veículo para ver os pedidos disponíveis:</p>
-        <input type="radio" id="caminhao" name="tipo" value="caminhao" required>
-        <label for="caminhao">Caminhão</label>
-        <input type="radio" id="camionete" name="tipo" value="camionete" required>
-        <label for="camionete">Camionete</label>
-        <input type="radio" id="carrocon" name="tipo" value="carrocon" required>
-        <label for="carrocon">Carro convencional</label>
-        <input type="radio" id="carroutili" name="tipo" value="carroutili" required>
-        <label for="carroutili">Carro Utilitário</label>
-        <input type="radio" id="moto" name="tipo" value="moto" required>
-        <label for="moto">Moto</label>
-        <input type="radio" id="todos" name="tipo" value="todos" required>
-        <label for="todos">Todos</label>
-        <input type="submit" name="submit" id="submit">
-    </form>
+    </nav>
+ <main>
+    
     <br>
-    <h1>Pedidos Disponíveis</h1>
+    <h1>Histórico de Carretos Realizados</h1>
     <div class="box-search">
         <input type="search" class="form-control w-25" placeholder="Pesquisar" id="pesquisar">
         <button onclick="searchdata()" class="btn btn-primary">
@@ -204,17 +180,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <thead>
                 <tr>
                     <th scope="col">#</th>
+                    <th scope="col">Status</th>
                     <th scope="col">ID do Cliente</th>
+                    <th scope="col">Volume</th>
+                    <th scope="col">Distância</th>
                     <th scope="col">Partida</th>
                     <th scope="col">Destino</th>
                     <th scope="col">Veiculo</th>
-                    <th scope="col">...</th>
-                    
-                    
+                    <th scope="col">ID do Motorista</th>
+                    <th scope="col">Ação</th>
                 </tr>
             </thead>
             <tbody>
-            <?php
+                <?php
                 if ($result) {
                     $rows = $result->fetch_all(MYSQLI_ASSOC);
                     $numRows = count($rows);
@@ -222,28 +200,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         for ($i = 0; $i < $numRows; $i++) {
                             echo "<tr>";
                             echo "<td>" . ($i + 1) . "</td>";
+                            echo "<td>" . $rows[$i]['status_pedido'] . "</td>";
                             echo "<td>" . $rows[$i]['id_cliente'] . "</td>";
+                            echo "<td>" . $rows[$i]['volume_carga'] . "</td>";
+                            echo "<td>" . $rows[$i]['distancia'] . "</td>"; 
                             echo "<td>" . $rows[$i]['partida'] . "</td>";
                             echo "<td>" . $rows[$i]['destino'] . "</td>";
                             echo "<td>" . $rows[$i]['tipo_veiculo'] . "</td>";
-                            // Corrigindo o botão "Ver mais"
-                            echo '<td>';
-                            // Adicionando o link "Ver mais" corretamente fora do form
-                            echo ' <a href="detalhes.php?id_pedido=' . $rows[$i]["id_pedido"] . '" class="btn btn-info">Ver mais</a>';
-                            echo '</td>';
+                            echo "<td>" . $rows[$i]['id_motorista'] . "</td>";
+                            echo '<td>
+                                    <form action="alterar_status.php" method="post" style="display:inline;">
+                                        <input type="hidden" name="pedido_id" value="' . $rows[$i]["id_pedido"] . '">
+                                        <button type="submit" class="btn btn-warning">Cancelar Pedido</button>
+                                    </form>
 
+                                  </td>';
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='15'>Nenhum resultado encontrado.</td></tr>";
+                        echo "<tr><td colspan='10'>Nenhum resultado encontrado.</td></tr>";
                     }
                 }
                 ?>
-
             </tbody>
         </table>
     </div>
-    </main> 
+  </main>  
 </body>
 <script>
     var search = document.getElementById('pesquisar');
@@ -253,8 +235,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     });
     function searchdata() {
-        window.location = 'buscarPedido.php?search=' + search.value;
+        window.location = 'pedAceito.php?search=' + search.value;
     }
 </script>
 <script src="script.js"></script>
 </html>
+<!-- <input type="hidden" name="pedido_status" value="' . $rows[$i]["status_pedido"] . '"> --> 

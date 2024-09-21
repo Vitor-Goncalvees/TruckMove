@@ -31,8 +31,11 @@ if(mysqli_num_rows($result) < 1)
 }
 else
 {
+    $cliente = $result->fetch_array();
+
     $_SESSION['email'] = $email;
     $_SESSION['senha'] = $senha;
+    $_SESSION['id_cliente'] = $cliente["id_cliente"];
     header('Location: sistema.php');
 }
 }

@@ -149,9 +149,8 @@
 
 
 <?php
-
+/*
 session_start();
-
 
 include_once('config.php');
 
@@ -159,13 +158,7 @@ $email = $_SESSION['email'];
 
 
 
-
-
-
-
-
-
-$sql = "SELECT * FROM view_veiculo where email = '$email' ";
+$sql = "SELECT * FROM veiculo WHERE id_motorista = ?";
 
 if (!empty($_GET['search'])) {
     $data = $_GET['search'];
@@ -174,24 +167,78 @@ if (!empty($_GET['search'])) {
 
 $result = $conexao->query($sql);
 
+
+
+include_once('config.php');
+session_start();
+
+if (!isset($_SESSION["email"])){
+    header("location:../Cadastro/TelaLogin.php");
+    exit;
+}
+
+$sql = "SELECT * FROM veiculo WHERE id_motorista = ?";
+if (!empty($_GET['search'])) {
+    $data = $_GET['search'];
+    $sql = "SELECT * FROM veiculo WHERE id_veiculo LIKE '%$data%' or placa LIKE '%$data%' or ano LIKE '%$data%' or modelo LIKE '%$data%'";
+}*/
+include_once('config.php');
+session_start();
+$email = $_SESSION['email'];
+
+if (!isset($_SESSION["email"])) {
+    header("location:../Cadastro/TelaLogin.php");
+    exit;
+}
+
+$sql = "SELECT * FROM veiculo WHERE id_motorista = ?"; //colocar a do motorista
+$params = [$_SESSION["motorista_id"]];
+$types = 's'; // Tipo de dado para os parâmetros (s para string)
+
+if (!empty($_GET['search'])) {
+    $data = $_GET['search'];
+    $sql = "SELECT * FROM veiculo WHERE (id_veiculo LIKE ? OR placa LIKE ? OR ano LIKE ? OR modelo LIKE ?)";
+    $params = ["%$data%", "%$data%", "%$data%", "%$data%", $email];
+    $types = 'sssss'; // Tipo de dado para os parâmetros (s para string)
+}
+
+$stmt = $conexao->prepare($sql);
+
+// Bind dos parâmetros
+$stmt->bind_param($types, ...$params);
+
+// Execução da consulta
+$stmt->execute();
+$result = $stmt->get_result();
+
+
+
+
+
+
+
+
+
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $listapedi = $_POST['tipo'];
     $sql = "";
 
     if ($listapedi == "caminhao") {
-        $sql = "SELECT * FROM view_veiculo WHERE veiculo = 'caminhao' and email = '$email'";
+        $sql = "SELECT * FROM veiculo WHERE veiculo = 'caminhao' ";
     } elseif ($listapedi == "camionete") {
-        $sql = "SELECT * FROM view_veiculo WHERE veiculo = 'camionete' and email = '$email'";
+        $sql = "SELECT * FROM veiculo WHERE veiculo = 'camionete' ";
     } elseif ($listapedi == "carrocon") {
-        $sql = "SELECT * FROM view_veiculo WHERE veiculo = 'carrocon' and email = '$email'";
+        $sql = "SELECT * FROM veiculo WHERE veiculo = 'carrocon' ";
     } elseif ($listapedi == "carroutili") {
-        $sql = "SELECT * FROM view_veiculo WHERE veiculo = 'carroutili' and email = '$email'";
+        $sql = "SELECT * FROM veiculo WHERE veiculo = 'carroutili' ";
     } elseif ($listapedi == "moto") {
-        $sql = "SELECT * FROM view_veiculo WHERE veiculo = 'motoca' and email = '$email'";
+        $sql = "SELECT * FROM veiculo WHERE veiculo = 'motoca' ";
     } elseif ($listapedi == "todos") {
-        $sql = "SELECT * FROM view_veiculo where email = '$email'";
+        $sql = "SELECT * FROM veiculo where id_motorista = ?";
     }/*elseif($listapedi == "Meus"){
-       $sql = "SELECT * FROM view_veiculo where email = '$email' ";
+       $sql = "SELECT * FROM veiculo where email = '$email' ";
     } */
     else {
         echo "Não encontramos os veiculos";
@@ -208,7 +255,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
     <title>Visualização de veiculos</title>
     <style>
         body {
@@ -242,13 +291,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-    <nav class="navbar bg-primary" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a  href="sistema.php" class="navbar-brand">TruckMove</a>
-            <a href="sistema.php" class="btn btn-outline-success" type="submit" style="background-color: #f28227; color:white;">Voltar</a>
-            <a href="deslogar.php" class="btn btn-outline-success" type="submit" style="background-color: red; color:white;">Deslogar</a>
+<nav id="sidebar">
+
+        <div id="sidebar_content">
+            <div id="user">
+            <img src="" id="user-avatar" alt="">
+
+            <p id="user_infos">
+
+                <span class="item-description">
+                    fulano tal
+                </span>
+
+                <span class="item-description">
+                    fulnaninho
+                </span>
+            </p>
+            </div>
+
+            <ul id="side_itens">
+
+            <li class="side-item active">
+                 <a href="sistema.php">
+                 <i class="fa-solid fa-home"></i>
+                    <span class="item-description"> 
+                        Home
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item active">
+                <a href="buscarPedido.php">
+                <i class="fa-solid fa-clipboard-list"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a href="veiculos.php">
+                <i class="fa-solid fa-truck"></i>
+                    <span class="item-description"> 
+                        Ver Meus Veículos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a  href="pedAceito.php">
+                <i class="fa-solid fa-bell"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos em Andamento
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a href="paginaEditarPerfil.php">
+                <i class="fa-solid fa-user"></i>
+                    <span class="item-description"> 
+                        Ver meu Perfil
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a  href="historico.php">
+                 <i class="fa-solid fa-address-book"></i>
+                    <span class="item-description"> 
+                        Ver Histórico
+                    </span>
+                </a>
+            </li>
+            </ul>
+
+            <button id="open_btn">
+                <i id="open_btn_icon" class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
-    </nav>
+
+        <div id="logout">
+            <button id="logout_btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <a href="deslogar.php" id="butao_sair">
+                <span class="item-description">
+                    Sair
+                </span>
+                </a>
+            </button>
+        </div>
+
+</nav>
     <form action="veiculos.php" method="POST">
         <p>Selecione o tipo de veículo para ver os veiculos disponíveis:</p>
         <input type="radio" id="caminhao" name="tipo" value="caminhao" required>
@@ -267,7 +402,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="meus">Meus</label>-->
         <input type="submit" name="submit" id="submit">
     </form>
-
+    <main>
     <a href="cadastroVeiculo.php" id="button_cadastro" class="btn btn-outline-success" type="submit" style="background-color: green; color:white;">Cadastrar Veiculo</a>
     <br>
     <h1>Veiculos Disponíveis</h1>
@@ -316,6 +451,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </tbody>
         </table>
     </div>
+    </main>
 </body>
 <script>
     var search = document.getElementById('pesquisar');
@@ -328,4 +464,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         window.location = 'veiculos.php?search=' + search.value;
     }
 </script>
+<script src="script.js"></script>
 </html>

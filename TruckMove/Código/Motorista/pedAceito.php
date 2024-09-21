@@ -5,17 +5,32 @@ include_once('config.php');
 session_start();
 $email = $_SESSION['email'];
 
-if (!isset($_SESSION["email"])){
+if (!isset($_SESSION["email"])) {
     header("location:../Cadastro/TelaLogin.php");
     exit;
 }
 
-$sql = "SELECT * FROM pedido where status_pedido = 1";
+$sql = "SELECT * FROM pedido WHERE status_pedido = 1 AND id_motorista = ?"; //colocar a do motorista
+$params = [$_SESSION["motorista_id"]];
+$types = 's'; // Tipo de dado para os parâmetros (s para string)
+
 if (!empty($_GET['search'])) {
     $data = $_GET['search'];
-    $sql = "SELECT * FROM pedido WHERE id LIKE '%$data%' or id_cliente LIKE '%$data%' or partida LIKE '%$data%' or destino LIKE '%$data%'";
+    $sql = "SELECT * FROM pedido WHERE (id LIKE ? OR id_cliente LIKE ? OR partida LIKE ? OR destino LIKE ?) AND status_pedido = 1 AND email = ?";
+    $params = ["%$data%", "%$data%", "%$data%", "%$data%", $email];
+    $types = 'sssss'; // Tipo de dado para os parâmetros (s para string)
 }
-$result = $conexao->query($sql);
+
+$stmt = $conexao->prepare($sql);
+
+// Bind dos parâmetros
+$stmt->bind_param($types, ...$params);
+
+// Execução da consulta
+$stmt->execute();
+$result = $stmt->get_result();
+
+
 
 ?>
 
@@ -24,7 +39,9 @@ $result = $conexao->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
     <title>Visualização de Pedidos</title>
     <style>
         body {
@@ -52,14 +69,102 @@ $result = $conexao->query($sql);
     </style>
 </head>
 <body>
-    <nav class="navbar bg-primary" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a  href="sistema.php" class="navbar-brand">TruckMove</a>
-            <a href="sistema.php" class="btn btn-outline-success" type="submit" style="background-color: #f28227; color:white;">Voltar</a>
-            <a href="deslogar.php" class="btn btn-outline-success" type="submit" style="background-color: red; color:white;">Deslogar</a>
+
+    <nav id="sidebar">
+
+        <div id="sidebar_content">
+            <div id="user">
+            <img src="" id="user-avatar" alt="">
+
+            <p id="user_infos">
+
+                <span class="item-description">
+                    fulano tal
+                </span>
+
+                <span class="item-description">
+                    fulnaninho
+                </span>
+            </p>
+            </div>
+
+            <ul id="side_itens">
+
+            <li class="side-item active">
+                 <a href="sistema.php">
+                 <i class="fa-solid fa-home"></i>
+                    <span class="item-description"> 
+                        Home
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item active">
+                <a href="buscarPedido.php">
+                <i class="fa-solid fa-clipboard-list"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a href="veiculos.php">
+                <i class="fa-solid fa-truck"></i>
+                    <span class="item-description"> 
+                        Ver Meus Veículos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a  href="pedAceito.php">
+                <i class="fa-solid fa-bell"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos em Andamento
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a href="paginaEditarPerfil.php">
+                <i class="fa-solid fa-user"></i>
+                    <span class="item-description"> 
+                        Ver meu Perfil
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a  href="historico.php">
+                 <i class="fa-solid fa-address-book"></i>
+                    <span class="item-description"> 
+                        Ver Histórico
+                    </span>
+                </a>
+            </li>
+            </ul>
+
+            <button id="open_btn">
+                <i id="open_btn_icon" class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
+
+        <div id="logout">
+            <button id="logout_btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <a href="deslogar.php" id="butao_sair">
+                <span class="item-description">
+                    Sair
+                </span>
+                </a>
+            </button>
+        </div>
+
     </nav>
-    <a href="cadastroPedido.php" class="btn btn-outline-success" type="submit" style="background-color: green; color:white;">Cadastrar Pedido</a>
+ <main>
+    
     <br>
     <h1>Pedidos Disponíveis</h1>
     <div class="box-search">
@@ -88,37 +193,47 @@ $result = $conexao->query($sql);
             </thead>
             <tbody>
                 <?php
-                if ($result) {
-                    $rows = $result->fetch_all(MYSQLI_ASSOC);
-                    $numRows = count($rows);
-                    if ($numRows > 0) {
-                        for ($i = 0; $i < $numRows; $i++) {
-                            echo "<tr>";
-                            echo "<td>" . ($i + 1) . "</td>";
-                            echo "<td>" . $rows[$i]['status_pedido'] . "</td>";
-                            echo "<td>" . $rows[$i]['id_cliente'] . "</td>";
-                            echo "<td>" . $rows[$i]['volume_carga'] . "</td>";
-                            echo "<td>" . $rows[$i]['distancia'] . "</td>"; 
-                            echo "<td>" . $rows[$i]['partida'] . "</td>";
-                            echo "<td>" . $rows[$i]['destino'] . "</td>";
-                            echo "<td>" . $rows[$i]['tipo_veiculo'] . "</td>";
-                            echo "<td>" . $rows[$i]['id_motorista'] . "</td>";
-                            echo '<td>
-                                    <form action="alterar_status.php" method="post" style="display:inline;">
-                                        <input type="hidden" name="pedido_id" value="' . $rows[$i]["id_pedido"] . '">
-                                        <button type="submit" class="btn btn-warning">Cancelar Pedido</button>
-                                    </form>
-                                  </td>';
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='10'>Nenhum resultado encontrado.</td></tr>";
+               
+               if ($result) {
+                $rows = $result->fetch_all(MYSQLI_ASSOC);
+                $numRows = count($rows);
+                if ($numRows > 0) {
+                    for ($i = 0; $i < $numRows; $i++) {
+                        echo "<tr>";
+                        echo "<td>" . ($i + 1) . "</td>";
+                        echo "<td>" . $rows[$i]['status_pedido'] . "</td>";
+                        echo "<td>" . $rows[$i]['id_cliente'] . "</td>";
+                        echo "<td>" . $rows[$i]['volume_carga'] . "</td>";
+                        echo "<td>" . $rows[$i]['distancia'] . "</td>"; 
+                        echo "<td>" . $rows[$i]['partida'] . "</td>";
+                        echo "<td>" . $rows[$i]['destino'] . "</td>";
+                        echo "<td>" . $rows[$i]['tipo_veiculo'] . "</td>";
+                        echo "<td>" . $rows[$i]['id_motorista'] . "</td>";
+                        echo '<td>
+                                <form action="alterar_status.php" method="post" style="display:inline;">
+                                    <input type="hidden" name="pedido_id" value="' . $rows[$i]["id_pedido"] . '">
+                                    <button type="submit" class="btn btn-warning">Cancelar Pedido</button>
+                                </form>
+                                <form action="finalizar_carreto.php" method="post" style="display:inline;">
+                                    <input type="hidden" name="pedido_id" value="' . $rows[$i]["id_pedido"] . '">
+                                    <button type="submit" class="btn btn-warning">Finalizar Pedido</button>
+                                </form>
+                                <a href="detalhes.php?id_pedido=' . $rows[$i]["id_pedido"] . '" class="btn btn-info">Ver mais</a>
+                              </td>';
+                        echo "</tr>";
                     }
+                } else {
+                    echo "<tr><td colspan='9'>Nenhum resultado encontrado.</td></tr>";
                 }
+            } else {
+                echo "<tr><td colspan='9'>Erro ao executar a consulta: " . $conexao->error . "</td></tr>";
+            }
+            
                 ?>
             </tbody>
         </table>
     </div>
+  </main>  
 </body>
 <script>
     var search = document.getElementById('pesquisar');
@@ -131,5 +246,6 @@ $result = $conexao->query($sql);
         window.location = 'pedAceito.php?search=' + search.value;
     }
 </script>
+<script src="script.js"></script>
 </html>
 <!-- <input type="hidden" name="pedido_status" value="' . $rows[$i]["status_pedido"] . '"> --> 

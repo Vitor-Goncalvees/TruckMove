@@ -28,43 +28,122 @@ else
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
     <title>Sistema</title>
 
-    <style>
-
-    body{
-    background-image: linear-gradient(to left, #003082,  rgb(20, 147, 220));
-    color:white; 
-        }
-        
-    .barra-menu{
-        background-color: #003082;
-        display: flex;
-        justify-content: start; 
-
-    }    
-
-       
-    </style>
 </head>
 <body>
-<nav class="navbar bg-primary" data-bs-theme="dark">
-    <div class="container-fluid">
-    <a class="navbar-brand">TruckMove</a>
-    <a  href="deslogar.php" class="btn btn-outline-success" type="submit" style="background-color: red; color:white;">Deslogar</a>
-  </div>
-</nav>
-    <section class="barra-menu">
-    <div class="box">
-        <a class="btnpedi" href="buscarPedido.php">Ver Pedidos</a>
-        <a class="btnpedi" href="veiculos.php">Ver Veiculos</a>
-        <a  class="btnpedi" href="pedAceito.php">Ver Pedidos em andamento</a>
-        <a  class="btnpedi" href="paginaEditarPerfil.php">Ver Perfil</a>
-    </div>
-    </section>
-    <h1>Acessou o Sistema Motorista</h1>
+    <nav id="sidebar">
 
-   
+        <div id="sidebar_content">
+            <div id="user">
+            <img src="" id="user-avatar" alt="">
+
+            <p id="user_infos">
+
+                <span class="item-description">
+                    fulano tal
+                </span>
+
+                <span class="item-description">
+                    fulnaninho
+                </span>
+            </p>
+             </div>
+
+            <ul id="side_itens">
+
+
+            <li class="side-item active">
+                 <a href="sistema.php">
+                 <i class="fa-solid fa-home"></i>
+                    <span class="item-description"> 
+                        Home
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item active">
+                 <a href="buscarPedido.php">
+                 <i class="fa-solid fa-clipboard-list"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a href="veiculos.php">
+                 <i class="fa-solid fa-truck"></i>
+                    <span class="item-description"> 
+                        Ver Meus Veículos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a  href="pedAceito.php">
+                 <i class="fa-solid fa-bell"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos em Andamento
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a href="paginaEditarPerfil.php">
+                 <i class="fa-solid fa-user"></i>
+                    <span class="item-description"> 
+                        Ver meu Perfil
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a  href="historico.php">
+                 <i class="fa-solid fa-address-book"></i>
+                    <span class="item-description"> 
+                        Ver Histórico
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a  href="calendario.php">
+                 <i class="fa-solid fa-calendar-days"></i>
+                    <span class="item-description"> 
+                        Ver Calendário
+                    </span>
+                </a>
+            </li>
+            </ul>
+
+            <button id="open_btn">
+                 <i id="open_btn_icon" class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div id="logout">
+            <button id="logout_btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <a href="deslogar.php" id="butao_sair">
+                <span class="item-description">
+                    Sair
+                </span>
+                </a>
+            </button>
+        </div>
+      
+    </nav>
+
+    <main>
+         <h1>Acessou o Sistema Motorista</h1>
+    </main>
+        
+
+   <script src="script.js"></script>
 </body>
 </html>
