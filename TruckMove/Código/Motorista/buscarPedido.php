@@ -48,7 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
     <title>Visualização de Pedidos</title>
     <style>
         body {
@@ -76,13 +78,101 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-    <nav class="navbar bg-primary" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a  href="sistema.php" class="navbar-brand">TruckMove</a>
-            <a href="sistema.php" class="btn btn-outline-success" type="submit" style="background-color: #f28227; color:white;">Voltar</a>
-            <a href="deslogar.php" class="btn btn-outline-success" type="submit" style="background-color: red; color:white;">Deslogar</a>
+    
+<nav id="sidebar">
+
+        <div id="sidebar_content">
+            <div id="user">
+            <img src="" id="user-avatar" alt="">
+
+            <p id="user_infos">
+
+                <span class="item-description">
+                    fulano tal
+                </span>
+
+                <span class="item-description">
+                    fulnaninho
+                </span>
+            </p>
+            </div>
+
+            <ul id="side_itens">
+
+            <li class="side-item active">
+                 <a href="sistema.php">
+                 <i class="fa-solid fa-home"></i>
+                    <span class="item-description"> 
+                        Home
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item active">
+                <a href="buscarPedido.php">
+                <i class="fa-solid fa-clipboard-list"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a href="veiculos.php">
+                <i class="fa-solid fa-truck"></i>
+                    <span class="item-description"> 
+                        Ver Meus Veículos
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a  href="pedAceito.php">
+                <i class="fa-solid fa-bell"></i>
+                    <span class="item-description"> 
+                        Ver Pedidos em Andamento
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                <a href="paginaEditarPerfil.php">
+                <i class="fa-solid fa-user"></i>
+                    <span class="item-description"> 
+                        Ver meu Perfil
+                    </span>
+                </a>
+            </li>
+
+            <li class="side-item">
+                 <a  href="historico.php">
+                 <i class="fa-solid fa-address-book"></i>
+                    <span class="item-description"> 
+                        Ver Histórico
+                    </span>
+                </a>
+            </li>
+            </ul>
+
+            <button id="open_btn">
+                <i id="open_btn_icon" class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
-    </nav>
+
+        <div id="logout">
+            <button id="logout_btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <a href="deslogar.php" id="butao_sair">
+                <span class="item-description">
+                    Sair
+                </span>
+                </a>
+                
+            </button>
+        </div>
+
+</nav>
+   <main> 
     <form action="buscarPedido.php" method="POST">
         <p>Selecione o tipo de veículo para ver os pedidos disponíveis:</p>
         <input type="radio" id="caminhao" name="tipo" value="caminhao" required>
@@ -115,20 +205,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">ID do Cliente</th>
-                    <th scope="col">Volume</th>
-                    <th scope="col">Distância</th>
-                    <th scope="col">Status</th>
                     <th scope="col">Partida</th>
                     <th scope="col">Destino</th>
                     <th scope="col">Veiculo</th>
-                    <th scope="col">ID do Motorista</th>
                     <th scope="col">...</th>
                     
                     
                 </tr>
             </thead>
             <tbody>
-                <?php
+            <?php
                 if ($result) {
                     $rows = $result->fetch_all(MYSQLI_ASSOC);
                     $numRows = count($rows);
@@ -137,31 +223,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             echo "<tr>";
                             echo "<td>" . ($i + 1) . "</td>";
                             echo "<td>" . $rows[$i]['id_cliente'] . "</td>";
-                            echo "<td>" . $rows[$i]['volume_carga'] . "</td>";
-                            echo "<td>" . $rows[$i]['distancia'] . "</td>";
-                            echo "<td>" . $rows[$i]['status_pedido'] . "</td>";
                             echo "<td>" . $rows[$i]['partida'] . "</td>";
                             echo "<td>" . $rows[$i]['destino'] . "</td>";
                             echo "<td>" . $rows[$i]['tipo_veiculo'] . "</td>";
-                            echo "<td>" . $rows[$i]['id_motorista'] . "</td>";
-                            echo '<td>
-                            <form action="aceitar_pedido.php" method="post" style="display:inline;">
-                                <input type="hidden" name="pedido_id" value="' . $rows[$i]["id_pedido"] . '">
-                                <button type="submit" class="btn btn-warning">Aceitar Pedido</button>
-                            </form>
-                          </td>';
-                         echo "</tr>";
+                            // Corrigindo o botão "Ver mais"
+                            echo '<td>';
+                            // Adicionando o link "Ver mais" corretamente fora do form
+                            echo ' <a href="detalhes.php?id_pedido=' . $rows[$i]["id_pedido"] . '" class="btn btn-info">Ver mais</a>';
+                            echo '</td>';
 
-                            
+                            echo "</tr>";
                         }
                     } else {
                         echo "<tr><td colspan='15'>Nenhum resultado encontrado.</td></tr>";
                     }
                 }
                 ?>
+
             </tbody>
         </table>
     </div>
+    </main> 
 </body>
 <script>
     var search = document.getElementById('pesquisar');
@@ -174,4 +256,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         window.location = 'buscarPedido.php?search=' + search.value;
     }
 </script>
+<script src="script.js"></script>
 </html>
