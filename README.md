@@ -1,2 +1,2 @@
-Commit referente a Sprint 05
+Commit referente a apresentação do Pitch
 
